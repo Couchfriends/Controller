@@ -20,7 +20,8 @@ var app = {
          * window resize.
          */
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
+        gameCode: ''
     },
     /**
      * PIXI stage
@@ -77,13 +78,51 @@ var app = {
         PIXI.loader.load();
     },
     start: function () {
-        document.getElementById('logo').className = 'animated fadeOut';
         app.receivedEvent('start');
-        app.renderer.view.style.display = 'block';
+        document.getElementById('logo').className = 'animated fadeOut';
+        COUCHFRIENDS.on('connect', function() {
+            document.getElementById('controller').className = 'animated fadeOut';
+            document.getElementById('form-connect').className = 'animated fadeIn';
+        });
+        COUCHFRIENDS.on('disconnect', function() {
+            document.getElementById('controller').className = 'animated fadeOut';
+            document.getElementById('form-connect').className = 'animated fadeIn';
+        });
+        COUCHFRIENDS.on('gameStart', function() {
+            document.getElementById('controller').style.display = 'block';
+            document.getElementById('controller').className = 'animated fadeIn';
+            document.getElementById('form-connect').className = 'animated fadeOut';
+        });
+        COUCHFRIENDS.on('gameDisconnect', function() {
+            document.getElementById('controller').style.display = 'none';
+            document.getElementById('controller').className = 'animated fadeOut';
+            document.getElementById('form-connect').className = 'animated fadeIn';
+        });
+        COUCHFRIENDS.on('playerIdentify', function(data) {
+            app.identify(data);
+        });
         app.render();
+        COUCHFRIENDS.connect();
         Controller.addButtonsABXY();
-        Controller.addDpad();
         Controller.addAxis();
+    },
+    joinGame: function(code) {
+        code = code || document.getElementById('input-code').value;
+        if (code && code != '') {
+            app.settings.gameCode = code.toUpperCase();
+        }
+        if (!COUCHFRIENDS.connected) {
+            COUCHFRIENDS.connect();
+            COUCHFRIENDS.emit('error', {message: 'Not connected, check your internet and try again.'});
+            return false;
+        }
+        COUCHFRIENDS.send({
+            topic: 'player',
+            action: 'join',
+            data: {
+                code: app.settings.gameCode
+            }
+        });
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -130,6 +169,9 @@ var app = {
 
     render: function() {
         requestAnimationFrame(app.render);
+        if (!COUCHFRIENDS.connected) {
+            return;
+        }
         app.renderer.render(app.stage);
     }
 };

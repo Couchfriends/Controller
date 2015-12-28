@@ -11,13 +11,21 @@ Controller.Button.prototype.init = function() {
     Controller.Element.prototype.init.call(this);
     this.object.interactive = true;
 
+    this.object.on('mousedown', this.onButtonDown.bind(this));
+    this.object.on('touchstart', this.onButtonDown.bind(this));
+
+    this.object.on('mouseup', this.onButtonUp.bind(this));
+    this.object.on('touchend', this.onButtonUp.bind(this));
+    this.object.on('mouseupoutside', this.onButtonUp.bind(this));
+    this.object.on('touchendoutside', this.onButtonUp.bind(this));
+
 };
 
-Controller.Button.prototype.onButtonDown = function() {
+Controller.Button.prototype.onButtonDown = function(data) {
 
     this.send(
         {
-            topic: 'interface',
+            topic: 'player',
             action: 'buttonDown',
             data: {
                 id: this.id
@@ -27,11 +35,11 @@ Controller.Button.prototype.onButtonDown = function() {
 
 };
 
-Controller.Button.prototype.onButtonUp = function() {
+Controller.Button.prototype.onButtonUp = function(data) {
 
     this.send(
         {
-            topic: 'interface',
+            topic: 'player',
             action: 'buttonUp',
             data: {
                 id: this.id

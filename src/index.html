@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta name="viewport"
+          content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title>Couchfriends</title>
-    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/app.css"/>
     <script src="js/utils/pixi.js"></script>
     <script src="js/utils/couchfriends.js"></script>
     <script src="js/controller/Controller.js"></script>
@@ -15,6 +16,16 @@
 </head>
 <body>
 <a id="menu-button"><img src="img/menu.png"></a>
-<img src="img/logo.png" id="logo" />
+<img src="img/logo.png" id="logo"/>
+
+<div id="form-connect">
+    <form method="post" onsubmit="app.joinGame();return false;">
+        <div class="input-group">
+            <input type="text" name="code" placeholder="Enter game code"
+                   id="input-code"/>
+            <button id="input-btn-join" type="submit">Join game</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

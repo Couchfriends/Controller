@@ -24,7 +24,7 @@ var COUCHFRIENDS = {
 
     },
 
-    _connected: false,
+    connected: false,
     _socket: {},
 
 
@@ -33,7 +33,7 @@ var COUCHFRIENDS = {
         if (typeof WebSocket == 'undefined') {
             COUCHFRIENDS.emit('error', {message: 'Websockets are not supported on this device.'});
         }
-        if (this._connected == true) {
+        if (this.connected == true) {
             return true;
         }
         this._socket = new WebSocket('ws://' + this.settings.host +':' + this.settings.port);
@@ -45,6 +45,7 @@ var COUCHFRIENDS = {
          */
         this._socket.onmessage = function (event) {
             var data = JSON.parse(event.data);
+            console.log(data);
             var callback = '';
             if (typeof data.topic == 'string') {
                 callback += data.topic;
@@ -61,13 +62,21 @@ var COUCHFRIENDS = {
         };
 
         COUCHFRIENDS._socket.onopen = function() {
-            COUCHFRIENDS._connected = true;
+            COUCHFRIENDS.connected = true;
             COUCHFRIENDS.emit('connect');
         };
         COUCHFRIENDS._socket.onclose = function () {
-            COUCHFRIENDS._connected = false;
+            COUCHFRIENDS.connected = false;
             COUCHFRIENDS.emit('disconnect');
         };
+    },
+
+    send: function(data) {
+
+        if (!this.connected) {
+            return;
+        }
+        COUCHFRIENDS._socket.send(JSON.stringify(data));
     }
 
 };
