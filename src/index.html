@@ -6,18 +6,14 @@
           content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title>Couchfriends</title>
     <link rel="stylesheet" href="css/app.css"/>
-    <script src="js/utils/pixi.js"></script>
-    <script src="js/utils/couchfriends.js"></script>
-    <script src="js/controller/Controller.js"></script>
-    <script src="js/controller/Controller.Element.js"></script>
-    <script src="js/controller/Controller.Button.js"></script>
-    <script src="js/controller/Controller.Axis.js"></script>
-    <script src="js/app.js"></script>
 </head>
 <body>
 <a id="menu-button"><img src="img/menu.png"></a>
+<div id="menu">
+    <div id="menu-links"></div>
+    <span id="status">Disconnected</span>
+</div>
 <img src="img/logo.png" id="logo"/>
-
 <div id="form-connect">
     <form method="post" onsubmit="app.joinGame();return false;">
         <div class="input-group">
@@ -27,5 +23,27 @@
         </div>
     </form>
 </div>
+<div id="form-login" class="form-center hidden">
+    <form method="post" onsubmit="app.login();return false">
+        <div class="input-group">
+            <label for="input-login-email">E-mail</label>
+            <input type="email" id="input-login-email" name="email" />
+        </div>
+        <div class="input-group">
+            <label for="input-login-password">Password</label>
+            <input type="password" id="input-login-password" name="password" />
+        </div>
+        <button id="input-btn-login" type="submit">Login</button>
+        <a onclick="document.getElementById('form-login').style.display = 'none';">Cancel</a>
+    </form>
+</div>
+<script src="js/utils/pixi.js"></script>
+<script src="js/utils/ajax.js"></script>
+<script src="js/utils/couchfriends.js"></script>
+<script src="js/controller/Controller.js"></script>
+<script src="js/controller/Controller.Element.js"></script>
+<script src="js/controller/Controller.Button.js"></script>
+<script src="js/controller/Controller.Axis.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
