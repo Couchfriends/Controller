@@ -11,6 +11,7 @@ var app = {
             'img/controller/thumbstick.png',
             'img/controller/thumbstick-bg.png'
         ],
+        gameConnected: false,
         /**
          * Global app settings
          */
@@ -60,7 +61,6 @@ var app = {
         // function, we must explicitly call 'app.receivedEvent(...);'
         startup: function () {
             app.receivedEvent('deviceready');
-            document.getElementById('menu-button').addEventListener('click', app.toggleMenu, false);
 
             var renderer = PIXI.autoDetectRenderer(
                 app.settings.width,
@@ -86,28 +86,30 @@ var app = {
         },
         start: function () {
             app.receivedEvent('start');
-            document.getElementById('menu-button').style.display = 'block';
-            document.getElementById('logo').className = 'animated fadeOut';
+            app.UI.init();
             COUCHFRIENDS.on('connect', function () {
-                document.getElementById('form-connect').style.display = 'block';
                 document.getElementById('controller').className = 'animated fadeOut';
-                document.getElementById('form-connect').className = 'animated fadeIn';
+                app.UI.showForm();
                 document.getElementById('status').innerHTML = 'Connected';
             });
             COUCHFRIENDS.on('disconnect', function () {
                 document.getElementById('controller').className = 'animated fadeOut';
-                document.getElementById('form-connect').className = 'animated fadeIn';
+                app.UI.showForm();
                 document.getElementById('status').innerHTML = 'Connected';
+                app.gameConnected = false;
             });
             COUCHFRIENDS.on('gameStart', function () {
                 document.getElementById('controller').style.display = 'block';
                 document.getElementById('controller').className = 'animated fadeIn';
-                document.getElementById('form-connect').className = 'animated fadeOut';
+                app.gameConnected = true;
+                app.UI.hideMenu();
+                app.UI.showForm('join');
             });
             COUCHFRIENDS.on('gameDisconnect', function () {
                 document.getElementById('controller').style.display = 'none';
                 document.getElementById('controller').className = 'animated fadeOut';
-                document.getElementById('form-connect').className = 'animated fadeIn';
+                app.gameConnected = false;
+                app.UI.showForm('join');
             });
             COUCHFRIENDS.on('playerIdentify', function (data) {
                 app.identify(data);
@@ -186,93 +188,9 @@ var app = {
             app.renderer.render(app.stage);
         },
 
-        /**
-         * Displays/Hides the menu and add links in the menu
-         */
-        toggleMenu: function () {
-            var menu = document.getElementById('menu');
-            var links = [];
-            var display = 'none';
-            links.push({url: './', name: '<img src="img/logo-menu.png" />'});
-            if (menu.offsetParent == null) {
-                display = 'block';
-                if (app.settings.user.token == null) {
-                    links.push({
-                        url: '',
-                        name: 'Login',
-                        click: 'app.toggleLoginForm();'
-                    });
-                    links.push({
-                        url: '',
-                        name: 'Register',
-                        click: 'app.toggleRegisterForm();'
-                    });
-                }
-                else {
-                    links.push({
-                        url: '',
-                        name: 'Logout',
-                        click: 'app.logout();'
-                    });
-                }
-            }
-            links.push({
-                url: 'http://www.couchfriends.com/pages/what-is-couchfriends',
-                name: 'Help',
-                target: '_blank'
-            });
-            var linksHtml = '';
-            for (var i = 0; i < links.length; i++) {
-                var link = links[i];
-                linksHtml += '<a';
-                if (link.url && link.url != '') {
-                    linksHtml += ' href="' + link.url + '"';
-                }
-                if (link.click && link.click != '') {
-                    linksHtml += ' onclick="' + link.click + '"';
-                }
-                if (link.target && link.target != '') {
-                    linksHtml += ' target="' + link.target + '"';
-                }
-                linksHtml += '>' + link.name + '</a>';
-            }
-            document.getElementById('menu-links').innerHTML = linksHtml;
-            menu.style.display = display;
-        },
-        toggleLoginForm: function () {
-            var loginForm = document.getElementById('form-login');
-            app.hideMenu();
-            app.hideRegister();
-            if (loginForm.offsetParent == null) {
-                loginForm.style.display = 'block';
-            }
-            else {
-                app.hideLogin();
-            }
-        },
-        toggleRegisterForm: function () {
-            var registerForm = document.getElementById('form-register');
-            app.hideMenu();
-            app.hideLogin();
-            if (registerForm.offsetParent == null) {
-                registerForm.style.display = 'block';
-            }
-            else {
-                app.hideRegister();
-            }
-        },
-        hideLogin: function () {
-            document.getElementById('form-login').style.display = 'none';
-        },
-        hideRegister: function () {
-            document.getElementById('form-register').style.display = 'none';
-        },
-        hideMenu: function () {
-            document.getElementById('menu').style.display = 'none';
-        },
         login: function () {
-            var email = document.getElementById('input-login-email').value;
-            var password = document.getElementById('input-login-password').value;
+            var email = document.getElementById('login-email').value;
+            var password = document.getElementById('login-password').value;
             var urlLogin = app.settings.host;
             urlLogin += 'users/token';
             var data = {
@@ -288,15 +206,15 @@ var app = {
                     if (!data.success) {
                         return app.error(data.data.message);
                     }
-                    app.hideLogin();
+                    app.UI.showForm('join');
                     app.settings.user = data.data;
                 },
                 headers);
         },
         register: function () {
-            var name = document.getElementById('input-register-name').value;
-            var email = document.getElementById('input-register-email').value;
-            var password = document.getElementById('input-register-password').value;
+            var name = document.getElementById('register-name').value;
+            var email = document.getElementById('register-email').value;
+            var password = document.getElementById('register-password').value;
             var urlRegister = app.settings.host;
             urlRegister += 'users/add';
             var data = {
@@ -315,13 +233,13 @@ var app = {
                     if (!data.success) {
                         return app.error(data.data.message);
                     }
-                    app.hideRegister();
+                    app.UI.showForm('join');
                     app.settings.user = data.data;
                 },
                 headers);
         },
         logout: function () {
-            app.hideMenu();
+            app.UI.hideMenu();
             app.settings.user.token = null;
         }
         ,
@@ -330,5 +248,104 @@ var app = {
         }
     }
     ;
+app.UI = {
+    formNames: [
+        'login', 'register', 'join'
+    ],
+    menuDisplayed: false,
+    init: function () {
+        document.getElementById('menu-button').style.display = 'block';
+        // Loading logo
+        document.getElementById('logo').className = 'animated fadeOut';
+        document.getElementById('menu-button').addEventListener('click', app.UI.toggleMenu, false);
+    },
+    /**
+     * Displays a form.
+     * @param formType string the type of form to show. E.g. login, register or join
+     * (default).
+     */
+    showForm: function (formType) {
+        formType = formType || 'join';
+        this.hideMenu();
+        if (this.formNames.indexOf(formType) < 0) {
+            formType = 'join';
+        }
+        for (var i = 0; i < this.formNames.length; i++) {
+            var formName = this.formNames[i];
+            document.getElementById('form-' + formName).className = 'form-container animated slideOutUp';
+        }
+        if (formType == 'join' && app.gameConnected == true) {
 
+        }
+        else {
+            var formContainer = document.getElementById('form-' + formType);
+            formContainer.className = 'form-container animated slideInDown';
+        }
+    },
+    toggleMenu: function () {
+        if (app.UI.menuDisplayed == false) {
+            app.UI.showMenu();
+        }
+        else {
+            app.UI.hideMenu();
+        }
+    },
+    showMenu: function () {
+        app.UI.menuDisplayed = true;
+        var menu = document.getElementById('menu');
+        var links = [];
+        links.push({url: './', name: '<img src="img/logo-menu.png" />'});
+        links.push({
+            url: '',
+            name: 'Play',
+            click: 'app.UI.showForm(\'join\');'
+        });
+        if (app.settings.user.token == null) {
+            links.push({
+                url: '',
+                name: 'Login',
+                click: 'app.UI.showForm(\'login\');'
+            });
+            links.push({
+                url: '',
+                name: 'Register',
+                click: 'app.UI.showForm(\'register\');'
+            });
+        }
+        else {
+            links.push({
+                url: '',
+                name: 'Logout',
+                click: 'app.logout();'
+            });
+        }
+        links.push({
+            url: 'http://www.couchfriends.com/pages/what-is-couchfriends',
+            name: 'Help',
+            target: '_blank'
+        });
+        var linksHtml = '';
+        for (var i = 0; i < links.length; i++) {
+            var link = links[i];
+            linksHtml += '<a';
+            if (link.url && link.url != '') {
+                linksHtml += ' href="' + link.url + '"';
+            }
+            if (link.click && link.click != '') {
+                linksHtml += ' onclick="' + link.click + '"';
+            }
+            if (link.target && link.target != '') {
+                linksHtml += ' target="' + link.target + '"';
+            }
+            linksHtml += '>' + link.name + '</a>';
+        }
+        document.getElementById('menu-links').innerHTML = linksHtml;
+        menu.className = 'animated slideInDown';
+    },
+    hideMenu: function () {
+        app.UI.menuDisplayed = false;
+        var menu = document.getElementById('menu');
+        menu.className = 'animated slideOutUp';
+    }
+};
 app.initialize();

@@ -13,6 +13,9 @@ Controller.Axis = function (settings) {
      */
     this._onePercent = 1;
 
+    this.dragging = false;
+    this.touchIdentifier = -1;
+
 };
 
 Controller.Axis.prototype = Object.create(Controller.Element.prototype);
@@ -43,13 +46,18 @@ Controller.Axis.prototype.init = function() {
 };
 
 Controller.Axis.prototype.onButtonDown = function(data) {
+    this.touchIdentifier = data.data.identifier;
     this.dragging = true;
     data.target.children[0].position.x = data.data.global.x - data.target.position.x;
     data.target.children[0].position.y = data.data.global.y - data.target.position.y;
 };
 
 Controller.Axis.prototype.onButtonUp = function(data) {
+    if (this.touchIdentifier != data.data.identifier) {
+        return;
+    }
     this.dragging = false;
+    this.touchIdentifier = -1;
     data.target.children[0].position.x = 0;
     data.target.children[0].position.y = 0;
     var dataToSend = {
@@ -60,7 +68,7 @@ Controller.Axis.prototype.onButtonUp = function(data) {
 };
 
 Controller.Axis.prototype.onButtonMove = function(data) {
-    if (this.dragging) {
+    if (this.dragging && this.touchIdentifier == data.data.identifier) {
         var dataToSend = {
             x: this.data.x,
             y: this.data.y

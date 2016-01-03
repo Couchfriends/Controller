@@ -2,6 +2,8 @@ Controller.Button = function (settings) {
 
     Controller.Element.call(this, settings);
 
+    this.touchIdentifier = -1;
+
 };
 
 Controller.Button.prototype = Object.create(Controller.Element.prototype);
@@ -23,6 +25,7 @@ Controller.Button.prototype.init = function() {
 
 Controller.Button.prototype.onButtonDown = function(data) {
 
+    this.touchIdentifier = data.data.identifier;
     this.send(
         {
             topic: 'player',
@@ -37,6 +40,9 @@ Controller.Button.prototype.onButtonDown = function(data) {
 
 Controller.Button.prototype.onButtonUp = function(data) {
 
+    if (this.touchIdentifier != data.data.identifier) {
+        return;
+    }
     this.send(
         {
             topic: 'player',

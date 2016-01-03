@@ -9,51 +9,70 @@
 </head>
 <body>
 <a id="menu-button"><img src="img/menu.png"></a>
-<div id="menu">
+
+<div id="menu" class="animated slideInDown">
     <div id="menu-links"></div>
     <span id="status">Disconnected</span>
 </div>
-<img src="img/logo.png" id="logo"/>
-<div id="form-connect">
-    <form method="post" onsubmit="app.joinGame();return false;">
-        <div class="input-group">
-            <input type="text" name="code" placeholder="Game code"
-                   id="input-code"/>
-            <button id="input-btn-join" type="submit">Join game</button>
-        </div>
-    </form>
+<img src="img/logo-white.png" id="logo"/>
+
+<div id="form-join" class="form-container">
+    <div class="text-center">
+        <img src="img/logo-white.png" class="logo"/>
+    </div>
+    <div class="form-group">
+        <form method="post" onsubmit="app.joinGame();return false;">
+            <div class="input-group">
+                <input type="text" name="code" placeholder="Game code"
+                       id="input-code"/>
+            </div>
+            <div class="input-group">
+                <button type="submit">Join game</button>
+            </div>
+        </form>
+    </div>
 </div>
-<div id="form-login" class="form-center hidden">
-    <form method="post" onsubmit="app.login();return false">
-        <div class="input-group">
-            <label for="input-login-email">E-mail</label>
-            <input type="email" id="input-login-email" name="email" />
-        </div>
-        <div class="input-group">
-            <label for="input-login-password">Password</label>
-            <input type="password" id="input-login-password" name="password" />
-        </div>
-        <button id="input-btn-login" type="submit">Login</button>
-        <a onclick="document.getElementById('form-login').style.display = 'none';">Cancel</a>
-    </form>
+<div id="form-login" class="form-container">
+    <div class="text-center">
+        <img src="img/logo-white.png" class="logo"/>
+    </div>
+    <div class="form-group">
+        <form method="post" onsubmit="app.login();return false;">
+            <div class="input-group">
+                <input type="email" name="email" id="login-email"
+                       placeholder="E-mail address"/>
+            </div>
+            <div class="input-group">
+                <input type="password" placeholder="Password" id="login-password" name="password"/>
+            </div>
+            <div class="input-group">
+                <button type="submit">Login</button>
+            </div>
+        </form>
+    </div>
 </div>
-<div id="form-register" class="form-center hidden">
-    <form method="post" onsubmit="app.register();return false">
-        <div class="input-group">
-            <label for="input-register-name">Profile name</label>
-            <input type="text" id="input-register-name" name="name" />
-        </div>
-        <div class="input-group">
-            <label for="input-register-email">E-mail</label>
-            <input type="email" id="input-register-email" name="email" />
-        </div>
-        <div class="input-group">
-            <label for="input-register-password">Password</label>
-            <input type="password" id="input-register-password" name="password" />
-        </div>
-        <button id="input-btn-register" type="submit">Register</button>
-        <a onclick="document.getElementById('form-register').style.display = 'none';">Cancel</a>
-    </form>
+<div id="form-register" class="form-container">
+    <div class="text-center">
+        <img src="img/logo-white.png" class="logo"/>
+    </div>
+    <div class="form-group">
+        <form method="post" onsubmit="app.UI.register();return false;">
+            <div class="input-group">
+                <input type="text" name="name" id="register-name"
+                       placeholder="Profile name"/>
+            </div>
+            <div class="input-group">
+                <input type="email" name="email" id="register-email"
+                       placeholder="E-mail address"/>
+            </div>
+            <div class="input-group">
+                <input type="password" placeholder="Password" id="register-password" name="password"/>
+            </div>
+            <div class="input-group">
+                <button type="submit">Register</button>
+            </div>
+        </form>
+    </div>
 </div>
 <script src="js/utils/pixi.js"></script>
 <script src="js/utils/ajax.js"></script>
