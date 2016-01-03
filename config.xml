@@ -8,15 +8,16 @@
         Couchfriends
     </author>
     <content src="index.html" />
-    <icon src="src/img/logo.png" width="512" height="512" density="mdpi" />
+    <icon src="src/img/logo-app.png" width="512" height="512" density="mdpi" />
     <plugin name="cordova-plugin-whitelist" spec="1" />
+    <preference name="DisallowOverscroll" value="true" />
     <access origin="*" />
     <allow-intent href="http://*.couchfriends.com/*" />
     <allow-intent href="https://*.couchfriends.com/*" />
     <allow-intent href="ws://*.couchfriends.com/*" />
     <allow-intent href="wss://*.couchfriends.com/*" />
-    <preference name="Fullscreen" value="true" />
     <platform name="android">
+        <preference name="Fullscreen" value="true" />
         <allow-intent href="market:*" />
     </platform>
     <platform name="ios">
