@@ -17,11 +17,23 @@ html, body {
 }
 body {
   overflow: hidden;
-  background: #4E6142;
+  background: #80a670; /* Old browsers */
+  background: -moz-linear-gradient(top, #80a670 0%, #4e6142 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #80a670 0%,#4e6142 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #80a670 0%,#4e6142 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80a670', endColorstr='#4e6142',GradientType=0 ); /* IE6-9 */
   background-size: cover;
   color: #222;
   font-family: Arial, Verdana, Helvatica, sans-serif;
   font-size: 14px;
+}
+h1 {
+  font-weight: normal;
+  font-size: 22px;
+}
+p {
+  line-height: 22px;
+  margin-bottom: 10px;
 }
 canvas {
   position: fixed;
@@ -34,6 +46,9 @@ a, button {
 }
 .text-center {
   text-align: center;
+}
+.text-right {
+  text-align: right;
 }
 ::-webkit-input-placeholder {
   color: rgba(255,255,255,.7);
@@ -109,18 +124,13 @@ input, button {
 
 /** For register and login **/
 .form-container {
-  overflow-y: scroll;
+  overflow-y: auto;
   transform: translate3d(0px, -100%, 0px);
   z-index: 101;
   position: absolute;
   width: 100%;
   height: 100%;
   padding: 20px;
-  background: #80a670; /* Old browsers */
-  background: -moz-linear-gradient(top, #80a670 0%, #4e6142 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(top, #80a670 0%,#4e6142 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom, #80a670 0%,#4e6142 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80a670', endColorstr='#4e6142',GradientType=0 ); /* IE6-9 */
   .logo {
     max-width: 50%;
     max-height: 128px;
@@ -130,5 +140,12 @@ input, button {
   }
   .input-group {
     margin-bottom: 5px;
+  }
+}
+#form-help {
+  color: #eee;
+  .logo {
+    max-height: 64px;
+    margin-bottom: 20px;
   }
 }

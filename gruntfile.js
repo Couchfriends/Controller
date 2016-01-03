@@ -5,13 +5,18 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             options: {
-                banner: '/**\n * @link www.couchfriends.com\n * @license MIT\n */\n'
+                banner: '/**\n * @link www.couchfriends.com\n * @copyright Fellicht <www.fellicht.nl>\n */\n'
             },
             build: {
                 files: {
-                    'build/game.js': [
+                    'build/js/game.js': [
                         'src/js/utils/pixi.js',
+                        'src/js/utils/ajax.js',
                         'src/js/utils/couchfriends.js',
+                        'src/js/controller/Controller.js',
+                        'src/js/controller/Controller.Element.js',
+                        'src/js/controller/Controller.Button.js',
+                        'src/js/controller/Controller.Axis.js',
                         'src/js/app.js'
                     ]
                 }
@@ -26,14 +31,14 @@ module.exports = function(grunt) {
                     ]
                 },
                 files: {
-                    "build/app.css": "src/css/app.less"
+                    "www/css/app.css": "src/css/app.less"
                 }
             }
         },
         copy: {
             main: {
                 src: ['**'],
-                dest: 'build/img/',
+                dest: 'www/img/',
                 cwd: 'src/img/',
                 expand: true
             }

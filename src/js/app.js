@@ -139,7 +139,7 @@ var app = {
         },
         // Update DOM on a Received Event
         receivedEvent: function (id) {
-            console.log('received', id);
+            //console.log('received', id);
         },
 
         /**
@@ -244,13 +244,13 @@ var app = {
         }
         ,
         error: function (message) {
-            console.warn(message);
+            //console.warn(message);
         }
     }
     ;
 app.UI = {
     formNames: [
-        'login', 'register', 'join'
+        'login', 'register', 'join', 'help'
     ],
     menuDisplayed: false,
     init: function () {
@@ -320,9 +320,9 @@ app.UI = {
             });
         }
         links.push({
-            url: 'http://www.couchfriends.com/pages/what-is-couchfriends',
+            url: '',
             name: 'Help',
-            target: '_blank'
+            click: 'app.UI.showForm(\'help\');'
         });
         var linksHtml = '';
         for (var i = 0; i < links.length; i++) {
