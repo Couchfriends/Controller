@@ -347,7 +347,11 @@ app.UI = {
         app.UI.menuDisplayed = true;
         var menu = document.getElementById('menu');
         var links = [];
-        links.push({url: './', name: '<img src="img/logo-menu.png" />'});
+        links.push({
+            url: '',
+            name: '<img class="logo-menu" src="img/logo-menu.png" />',
+            click: 'app.UI.showForm(\'join\');'
+        });
         links.push({
             url: '',
             name: 'Play',
