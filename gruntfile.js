@@ -9,7 +9,7 @@ module.exports = function(grunt) {
             },
             build: {
                 files: {
-                    'build/js/game.js': [
+                    'www/js/app.js': [
                         'src/js/utils/pixi.js',
                         'src/js/utils/ajax.js',
                         'src/js/utils/couchfriends.js',
@@ -41,6 +41,36 @@ module.exports = function(grunt) {
                 dest: 'www/img/',
                 cwd: 'src/img/',
                 expand: true
+            },
+            apk: {
+                src: 'platforms/android/build/outputs/apk/android-debug.apk',
+                dest: 'couchfriends.apk'
+            }
+        },
+        cordovacli: {
+            options: {
+                path: './',
+                cli: 'cordova'
+            },
+            cordova: {
+                options: {
+                    command: ['build'],
+                    platforms: ['android'],
+                    path: './',
+                    id: 'fellicht.couchfriends.controller',
+                    name: 'Couchfriends'
+                }
+            },
+            add_plugins: {
+                options: {
+                    command: 'plugin',
+                    action: 'add',
+                    plugins: [
+                        'device-motion',
+                        'device-orientation',
+                        'vibration'
+                    ]
+                }
             }
         }
     });
@@ -49,10 +79,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Default task(s).
-    grunt.registerTask('default', ['uglify', 'less', 'copy']);
+    grunt.registerTask('default', ['uglify', 'less', 'copy', 'cordovacli', 'copy:apk']);
 
     grunt.loadNpmTasks('grunt-contrib-less');
 
     grunt.loadNpmTasks('grunt-contrib-copy');
+
+    grunt.loadNpmTasks('grunt-cordovacli');
 
 };

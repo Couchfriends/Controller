@@ -1,3 +1,7 @@
 build/
 node_modules/
 .idea/
+hooks/
+platforms/
+plugins/
+couchfriends.apk
