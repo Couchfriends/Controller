@@ -23,7 +23,7 @@ var app = {
         width: window.innerWidth,
         height: window.innerHeight,
         gameCode: '',
-        host: 'http://localhost/couchfriends/api/',
+        host: 'http://www.couchfriends.com/api/',
         user: {
             token: null,
             name: '',
@@ -251,7 +251,8 @@ var app = {
                 app.setUser(user);
                 app.settings.user = user;
             },
-            headers);
+            headers
+        );
     },
     logout: function () {
         app.saveUser();

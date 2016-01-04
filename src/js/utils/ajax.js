@@ -26,6 +26,7 @@ function ajax(url, data, callback, headers, responseType) {
             var value = headers[type];
             x.setRequestHeader(type, value);
         }
+        x.withCredentials = true;
         x.responseType = responseType;
         x.onreadystatechange = function () {
             if (x.readyState == 4) {
