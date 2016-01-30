@@ -3,32 +3,84 @@
  *
  * Copyright (c) 2014 Component contributors <dev@component.io>
  */
-function Emitter(t){return t?mixin(t):void 0}function mixin(t){for(var e in Emitter.prototype)t[e]=Emitter.prototype[e];return t}Emitter.prototype.on=Emitter.prototype.addEventListener=function(t,e){return this._callbacks=this._callbacks||{},(this._callbacks["$"+t]=this._callbacks["$"+t]||[]).push(e),this},Emitter.prototype.once=function(t,e){function i(){this.off(t,i),e.apply(this,arguments)}return i.fn=e,this.on(t,i),this},Emitter.prototype.off=Emitter.prototype.removeListener=Emitter.prototype.removeAllListeners=Emitter.prototype.removeEventListener=function(t,e){if(this._callbacks=this._callbacks||{},0==arguments.length)return this._callbacks={},this;var i=this._callbacks["$"+t];if(!i)return this;if(1==arguments.length)return delete this._callbacks["$"+t],this;for(var r,s=0;s<i.length;s++)if(r=i[s],r===e||r.fn===e){i.splice(s,1);break}return this},Emitter.prototype.emit=function(t){this._callbacks=this._callbacks||{};var e=[].slice.call(arguments,1),i=this._callbacks["$"+t];if(i){i=i.slice(0);for(var r=0,s=i.length;s>r;++r)i[r].apply(this,e)}return this},Emitter.prototype.listeners=function(t){return this._callbacks=this._callbacks||{},this._callbacks["$"+t]||[]},Emitter.prototype.hasListeners=function(t){return!!this.listeners(t).length};
+function Emitter(t) {
+    return t ? mixin(t) : void 0
+}
+function mixin(t) {
+    for (var e in Emitter.prototype)t[e] = Emitter.prototype[e];
+    return t
+}
+Emitter.prototype.on = Emitter.prototype.addEventListener = function (t, e) {
+    return this._callbacks = this._callbacks || {}, (this._callbacks["$" + t] = this._callbacks["$" + t] || []).push(e), this
+}, Emitter.prototype.once = function (t, e) {
+    function i() {
+        this.off(t, i), e.apply(this, arguments)
+    }
+
+    return i.fn = e, this.on(t, i), this
+}, Emitter.prototype.off = Emitter.prototype.removeListener = Emitter.prototype.removeAllListeners = Emitter.prototype.removeEventListener = function (t, e) {
+    if (this._callbacks = this._callbacks || {}, 0 == arguments.length)return this._callbacks = {}, this;
+    var i = this._callbacks["$" + t];
+    if (!i)return this;
+    if (1 == arguments.length)return delete this._callbacks["$" + t], this;
+    for (var r, s = 0; s < i.length; s++)if (r = i[s], r === e || r.fn === e) {
+        i.splice(s, 1);
+        break
+    }
+    return this
+}, Emitter.prototype.emit = function (t) {
+    this._callbacks = this._callbacks || {};
+    var e = [].slice.call(arguments, 1), i = this._callbacks["$" + t];
+    if (i) {
+        i = i.slice(0);
+        for (var r = 0, s = i.length; s > r; ++r)i[r].apply(this, e)
+    }
+    return this
+}, Emitter.prototype.listeners = function (t) {
+    return this._callbacks = this._callbacks || {}, this._callbacks["$" + t] || []
+}, Emitter.prototype.hasListeners = function (t) {
+    return !!this.listeners(t).length
+};
+
+var peerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection ||
+    window.webkitRTCPeerConnection || window.msRTCPeerConnection;
+var sessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription ||
+    window.webkitRTCSessionDescription || window.msRTCSessionDescription;
+var iceCandidate = window.webkitRTCIceCandidate || window.mozRTCIceCandidate || window.RTCIceCandidate;
 
 var COUCHFRIENDS = {
 
     settings: {
+        peerOffer: {},
         host: 'ws.couchfriends.com',
-        port: '80'
-    },
-
-    callbacks: {
-        'game.start': 'gameStart',
-        'game.disconnect': 'gameDisconnect',
-        'player.identify': 'playerIdentify',
-        'interface.buttonAdd': 'buttonAdd',
-        'interface.buttonRemove': 'buttonRemove',
-        'interface.vibrate': 'vibrate',
-        'game.achievementUnlock': 'achievementUnlock',
-        'error': 'error'
-
+        port: '80',
+        peerConfig: {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        peerConnection: {
+            'optional': [{'DtlsSrtpKeyAgreement': true}, {'RtpDataChannels': true}]
+        },
+        peerDataChannelConfig: {
+            ordered: false,
+            reliable: false
+        },
+        sdpConstraints: {
+            'offerToReceiveAudio': false,
+            'offerToReceiveVideo': false
+        },
+        // @todo Let player set name and color
+        // @todo info needs to come from server, too.
+        client: {
+            id: 0,
+            name: 'New player',
+            color: '#ff9900'
+        }
     },
 
     connected: false,
-    _socket: {},
+    peerConnected: false,
+    socket: {},
+    socketPeer: {},
 
-
-    connect: function() {
+    connect: function () {
 
         if (typeof WebSocket == 'undefined') {
             COUCHFRIENDS.emit('error', {message: 'Websockets are not supported on this device.'});
@@ -36,16 +88,15 @@ var COUCHFRIENDS = {
         if (this.connected == true) {
             return true;
         }
-        this._socket = new WebSocket('ws://' + this.settings.host +':' + this.settings.port);
+        this.socket = new WebSocket('wss://' + this.settings.host + ':' + this.settings.port);
 
         /**
          * Websocket message received. Parse the topic and action parameters and
          * emit the callback related to this event.
          * @param event object the websocket event
          */
-        this._socket.onmessage = function (event) {
+        this.socket.onmessage = function (event) {
             var data = JSON.parse(event.data);
-            console.log(data);
             var callback = '';
             if (typeof data.topic == 'string') {
                 callback += data.topic;
@@ -53,30 +104,88 @@ var COUCHFRIENDS = {
             if (typeof data.action == 'string') {
                 callback += '.' + data.action;
             }
-            if (typeof COUCHFRIENDS.callbacks[callback] != 'undefined') {
-                COUCHFRIENDS.emit(COUCHFRIENDS.callbacks[callback], data.data);
-            }
-            if (typeof COUCHFRIENDS.callbacks['_' + callback] != 'undefined') {
-                COUCHFRIENDS.emit(COUCHFRIENDS.callbacks['_' + callback], data.data);
-            }
+
+            COUCHFRIENDS.emit(callback, data.data);
+            console.log('receiving', callback, data.data);
         };
 
-        COUCHFRIENDS._socket.onopen = function() {
+        COUCHFRIENDS.socket.onopen = function () {
             COUCHFRIENDS.connected = true;
             COUCHFRIENDS.emit('connect');
+            COUCHFRIENDS._connectPeersocket();
         };
-        COUCHFRIENDS._socket.onclose = function () {
+        COUCHFRIENDS.socket.onclose = function () {
             COUCHFRIENDS.connected = false;
             COUCHFRIENDS.emit('disconnect');
         };
     },
 
-    send: function(data) {
+    _connectPeersocket: function () {
+
+        if (typeof peerConnection == 'undefined') {
+            COUCHFRIENDS.emit('error', 'Peer connection not available.');
+            return false;
+        }
+        COUCHFRIENDS.socketPeer = new peerConnection(
+            COUCHFRIENDS.settings.peerConfig,
+            COUCHFRIENDS.settings.peerConnection
+        );
+
+        COUCHFRIENDS.peerDataChannel = COUCHFRIENDS.socketPeer.createDataChannel(
+            'messages',
+            COUCHFRIENDS.settings.peerDataChannelConfig
+        );
+
+        COUCHFRIENDS.peerDataChannel.onerror = function (error) {
+            COUCHFRIENDS.emit('error', 'Data channel error: ' + error);
+        };
+
+        COUCHFRIENDS.peerDataChannel.onmessage = function (event) {
+            console.log("Got Data Channel Message:", event);
+        };
+
+        COUCHFRIENDS.peerDataChannel.onopen = function () {
+            console.log('Peer is open for connections.');
+            COUCHFRIENDS.peerConnected = true;
+        };
+
+        COUCHFRIENDS.peerDataChannel.onclose = function () {
+            console.log('Peer connection closed.');
+            //COUCHFRIENDS.peerConnected = false;
+        };
+
+        COUCHFRIENDS.socketPeer.ondatachannel = function() {
+            console.log('peerConnection.ondatachannel event fired.');
+        };
+
+        COUCHFRIENDS.socketPeer.onicecandidate = function (event) {
+            if (event.candidate) {
+                var jsonData = {
+                    // @todo set id parameter here too. Maybe
+                    topic: 'player', // @todo make peer
+                    action: 'ice',
+                    data: JSON.stringify(event.candidate)
+                };
+                COUCHFRIENDS.send(jsonData);
+            }
+        };
+    },
+
+    send: function (data) {
 
         if (!this.connected) {
             return;
         }
-        COUCHFRIENDS._socket.send(JSON.stringify(data));
+        if (COUCHFRIENDS.peerConnected == true) {
+            console.log('sending through peer.', data);
+            // @todo Send id in data too
+            data.id =
+            COUCHFRIENDS.peerDataChannel.send(JSON.stringify(data));
+        }
+        else {
+            console.log('sending', data);
+            COUCHFRIENDS.socket.send(JSON.stringify(data));
+        }
     }
 
 };
@@ -91,7 +200,7 @@ Emitter(COUCHFRIENDS);
  *
  * @return void
  */
-COUCHFRIENDS.on('error', function(data) {
+COUCHFRIENDS.on('error', function (data) {
     if (typeof data == 'string') {
         data = {
             message: data
@@ -104,13 +213,13 @@ COUCHFRIENDS.on('error', function(data) {
  * Callback after connection to the WebSocket server is successful.
  * Best practise will be hosting a new game after a successful connection.
  */
-COUCHFRIENDS.on('connect', function() {
+COUCHFRIENDS.on('connect', function () {
 });
 
 /**
  * Callback after the connection is lost from the WebSocket server.
  */
-COUCHFRIENDS.on('disconnect', function() {
+COUCHFRIENDS.on('disconnect', function () {
 });
 
 
@@ -120,8 +229,48 @@ COUCHFRIENDS.on('disconnect', function() {
  * @param {object} data List with game data
  * @param {string} data.code The game code players need to fill to join this game
  */
-COUCHFRIENDS.on('gameStart', function(data) {
-    //console.log('Game started with code: '+ data.code);
+COUCHFRIENDS.on('gameStart', function (data) {
+    console.log('Game started with code: '+ data.code);
+});
+
+COUCHFRIENDS.on('player.call', function (data) {
+
+    console.log('Getting peer call from host.', data);
+    var offer = data.peerDescription;
+    COUCHFRIENDS.socketPeer.setRemoteDescription(new sessionDescription(offer), function() {
+            console.log('Anser fase 1.');
+        COUCHFRIENDS.socketPeer.createAnswer(function(answer) {
+            console.log('Anser fase 2.', answer);
+            COUCHFRIENDS.socketPeer.setLocalDescription(new sessionDescription(answer), function() {
+                // send the answer to the remote connection
+                console.log('Answered. Send answer.', answer);
+                    var jsonData = {
+                        topic: 'player',
+                        action: 'answer',
+                        data: answer
+                    };
+                COUCHFRIENDS.send(jsonData);
+                    //COUCHFRIENDS.peerConnected = true;
+            },
+            function (error) {
+                console.log(error);
+            });
+        },
+        function (error) {
+            console.log(error);
+        });
+    },
+    function (error) {
+        console.log(error);
+    });
+
+});
+
+COUCHFRIENDS.on('player.ice', function (data) {
+    console.log('Ice server', data);
+    var candidate = JSON.parse(data);
+    console.log(candidate);
+    COUCHFRIENDS.socketPeer.addIceCandidate(new iceCandidate(candidate));
 });
 
 /**
@@ -133,15 +282,15 @@ COUCHFRIENDS.on('gameStart', function(data) {
  * @param {string} [data.color] The primary color to identify the player on the screen
  * names and characters that might be included in the name.
  */
-COUCHFRIENDS.on('playerIdentify', function(data) {
-    //console.log('Player orientation changed. Player id: ' + data.id + ' Orientation: ' + data.x + ', ' + data.y + ', ' + data.z);
+COUCHFRIENDS.on('player.identify', function (data) {
+    COUCHFRIENDS.settings.client = data;
 });
 
 /**
  * Callback when a host game disconnected from the webserver
  *
  */
-COUCHFRIENDS.on('gameDisconnect', function() {
+COUCHFRIENDS.on('gameDisconnect', function () {
 });
 
 /**
@@ -179,14 +328,14 @@ COUCHFRIENDS.on('gameDisconnect', function() {
             y: 0
         }
  */
-COUCHFRIENDS.on('buttonAdd', function(data) {
+COUCHFRIENDS.on('buttonAdd', function (data) {
 });
 
 /**
  * Callback when a button should be removed from the interface
  *
  */
-COUCHFRIENDS.on('buttonRemove', function(data) {
+COUCHFRIENDS.on('buttonRemove', function (data) {
 });
 
 /**
@@ -195,7 +344,7 @@ COUCHFRIENDS.on('buttonRemove', function(data) {
  * Currently only maximum 1000ms supported
  *
  */
-COUCHFRIENDS.on('vibrate', function(data) {
+COUCHFRIENDS.on('vibrate', function (data) {
     // console.log('Vibrate for: ' + data.duration + 'ms');
 });
 

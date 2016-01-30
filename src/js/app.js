@@ -23,7 +23,7 @@ var app = {
         width: window.innerWidth,
         height: window.innerHeight,
         gameCode: '',
-        host: 'http://www.couchfriends.com/api/',
+        host: 'https://couchfriends.com/api/',
         user: {
             token: null,
             name: '',
@@ -108,7 +108,7 @@ var app = {
             document.getElementById('status').innerHTML = 'Connected';
             app.gameConnected = false;
         });
-        COUCHFRIENDS.on('gameStart', function () {
+        COUCHFRIENDS.on('game.start', function () {
             document.getElementById('controller').style.display = 'block';
             document.getElementById('controller').className = 'animated fadeIn';
             app.gameConnected = true;
@@ -140,7 +140,7 @@ var app = {
             return false;
         }
         COUCHFRIENDS.send({
-            topic: 'player',
+            topic: 'game',
             action: 'join',
             data: {
                 code: app.settings.gameCode
