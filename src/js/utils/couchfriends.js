@@ -27,6 +27,7 @@ var COUCHFRIENDS = {
             secure: COUCHFRIENDS.settings.secure
         });
         peer.on('open', function (code) {
+            COUCHFRIENDS.player.id = code;
             document.getElementById('controller').className = 'animated fadeOut';
             app.UI.showForm();
             document.getElementById('status').innerHTML = 'Connected';
@@ -53,6 +54,7 @@ var COUCHFRIENDS = {
         DataConnection.on('open', function (data) {
             document.getElementById('controller').style.display = 'block';
             document.getElementById('controller').className = 'animated fadeIn';
+            document.getElementById('input-code').blur();
             app.gameConnected = true;
             app.UI.showForm();
         });
@@ -111,7 +113,7 @@ COUCHFRIENDS.on('error', function (data) {
  * Callback after connection to the WebSocket server is successful.
  * Best practise will be hosting a new game after a successful connection.
  */
-COUCHFRIENDS.on('connect', function () {
+COUCHFRIENDS.on('connect', function (data) {
 });
 
 /**

@@ -25,6 +25,7 @@ var app = {
         gameCode: '',
         host: 'https://couchfriends.com/api/',
         user: {
+            id: 'abc',
             token: null,
             name: '',
             color: 0xffffff
@@ -225,6 +226,7 @@ var app = {
     setUser: function(user) {
         user = user || {};
         app.settings.user = {
+            id: app.settings.user.id,
             token: user.token || null,
             name: user.name || '',
             color: user.color || 0xffffff
