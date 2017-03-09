@@ -10,6 +10,8 @@ module.exports = function(grunt) {
             build: {
                 files: {
                     'www/js/app.js': [
+                        'src/js/utils/Emitter.js',
+                        'src/js/utils/peer.js',
                         'src/js/utils/pixi.js',
                         'src/js/utils/ajax.js',
                         'src/js/utils/couchfriends.js',
@@ -79,12 +81,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Default task(s).
-    grunt.registerTask('default', ['uglify', 'less', 'copy', 'cordovacli', 'copy:apk']);
+    grunt.registerTask('default', ['uglify', 'less', 'copy']);//, 'cordovacli', 'copy:apk']);
 
     grunt.loadNpmTasks('grunt-contrib-less');
 
     grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.loadNpmTasks('grunt-cordovacli');
+    // grunt.loadNpmTasks('grunt-cordovacli');
 
 };

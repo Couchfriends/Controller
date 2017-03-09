@@ -97,8 +97,7 @@ Controller.Axis.prototype.send = function(data) {
     this.data.x = data.x;
     this.data.y = data.y;
     var jsonData = {
-        topic: 'player',
-        action: 'orientation',
+        topic: 'player.orientation',
         data: data
     };
     Controller.Element.prototype.send.call(this, jsonData);

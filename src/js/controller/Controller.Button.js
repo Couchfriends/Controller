@@ -28,8 +28,7 @@ Controller.Button.prototype.onButtonDown = function(data) {
     this.touchIdentifier = data.data.identifier;
     this.send(
         {
-            topic: 'player',
-            action: 'buttonDown',
+            topic: 'player.buttonDown',
             data: {
                 id: this.id
             }
@@ -45,8 +44,7 @@ Controller.Button.prototype.onButtonUp = function(data) {
     }
     this.send(
         {
-            topic: 'player',
-            action: 'buttonUp',
+            topic: 'player.buttonUp',
             data: {
                 id: this.id
             }

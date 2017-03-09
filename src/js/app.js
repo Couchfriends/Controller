@@ -97,55 +97,10 @@ var app = {
     start: function () {
         app.receivedEvent('start');
         app.UI.init();
-        COUCHFRIENDS.on('connect', function () {
-            document.getElementById('controller').className = 'animated fadeOut';
-            app.UI.showForm();
-            document.getElementById('status').innerHTML = 'Connected';
-        });
-        COUCHFRIENDS.on('disconnect', function () {
-            document.getElementById('controller').className = 'animated fadeOut';
-            app.UI.showForm();
-            document.getElementById('status').innerHTML = 'Connected';
-            app.gameConnected = false;
-        });
-        COUCHFRIENDS.on('game.start', function () {
-            document.getElementById('controller').style.display = 'block';
-            document.getElementById('controller').className = 'animated fadeIn';
-            app.gameConnected = true;
-            app.UI.hideMenu();
-            app.UI.showForm('join');
-        });
-        COUCHFRIENDS.on('gameDisconnect', function () {
-            document.getElementById('controller').style.display = 'none';
-            document.getElementById('controller').className = 'animated fadeOut';
-            app.gameConnected = false;
-            app.UI.showForm('join');
-        });
-        COUCHFRIENDS.on('playerIdentify', function (data) {
-            app.identify(data);
-        });
         app.render();
         COUCHFRIENDS.connect();
         Controller.addButtonsABXY();
         Controller.addAxis();
-    },
-    joinGame: function (code) {
-        code = code || document.getElementById('input-code').value;
-        if (code && code != '') {
-            app.settings.gameCode = code.toUpperCase();
-        }
-        if (!COUCHFRIENDS.connected) {
-            COUCHFRIENDS.connect();
-            COUCHFRIENDS.emit('error', {message: 'Not connected, check your internet and try again.'});
-            return false;
-        }
-        COUCHFRIENDS.send({
-            topic: 'game',
-            action: 'join',
-            data: {
-                code: app.settings.gameCode
-            }
-        });
     },
     // Update DOM on a Received Event
     receivedEvent: function (id) {
@@ -181,7 +136,7 @@ var app = {
      */
     identify: function (data) {
 
-        data = data || {};
+        data = data || app.settings.user;
         if (data.color != null) {
             for (var i = 0; i < app.elements.length; i++) {
                 var element = app.elements[i];
@@ -192,7 +147,7 @@ var app = {
 
     render: function () {
         requestAnimationFrame(app.render);
-        if (!COUCHFRIENDS.connected) {
+        if (COUCHFRIENDS._socket != null && COUCHFRIENDS._socket.open == false) {
             return;
         }
         app.renderer.render(app.stage);
@@ -274,6 +229,7 @@ var app = {
             name: user.name || '',
             color: user.color || 0xffffff
         };
+        app.identify(user);
     },
     /**
      * Saves the user in localstorage.
