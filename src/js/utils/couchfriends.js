@@ -22,9 +22,9 @@ var COUCHFRIENDS = {
             return false;
         }
         var peer = new Peer({
-            host: COUCHFRIENDS.settings.host,
-            port: COUCHFRIENDS.settings.port,
-            secure: COUCHFRIENDS.settings.secure
+            // host: COUCHFRIENDS.settings.host,
+            // port: COUCHFRIENDS.settings.port,
+            // secure: COUCHFRIENDS.settings.secure
         });
         peer.on('open', function (code) {
             COUCHFRIENDS.player.id = code;

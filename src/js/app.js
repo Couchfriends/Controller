@@ -154,67 +154,67 @@ var app = {
         app.renderer.render(app.stage);
     },
 
-    login: function () {
-        var email = document.getElementById('login-email').value;
-        var password = document.getElementById('login-password').value;
-        var urlLogin = app.settings.host;
-        urlLogin += 'users/token';
-        var data = {
-            "email": email,
-            "password": password
-        };
-        var headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        };
-        ajax(urlLogin, JSON.stringify(data), function (data) {
-                data = JSON.parse(data);
-                if (!data.success) {
-                    return app.error(data.data.message);
-                }
-                app.UI.showForm('join');
-                var user = data.data;
-                app.saveUser(user);
-                app.setUser(user);
-            },
-            headers);
-    },
-    register: function () {
-        var name = document.getElementById('register-name').value;
-        var email = document.getElementById('register-email').value;
-        var password = document.getElementById('register-password').value;
-        var urlRegister = app.settings.host;
-        urlRegister += 'users/add';
-        var data = {
-            "profile": {
-                "name": name
-            },
-            "email": email,
-            "password": password
-        };
-        var headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        };
-        ajax(urlRegister, JSON.stringify(data), function (data) {
-                data = JSON.parse(data);
-                if (!data.success) {
-                    return app.error(data.data.message);
-                }
-                app.UI.showForm('join');
-                var user = data.data;
-                app.saveUser(user);
-                app.setUser(user);
-                app.settings.user = user;
-            },
-            headers
-        );
-    },
-    logout: function () {
-        app.saveUser();
-        app.setUser();
-        app.UI.hideMenu();
-    },
+    // login: function () {
+    //     var email = document.getElementById('login-email').value;
+    //     var password = document.getElementById('login-password').value;
+    //     var urlLogin = app.settings.host;
+    //     urlLogin += 'users/token';
+    //     var data = {
+    //         "email": email,
+    //         "password": password
+    //     };
+    //     var headers = {
+    //         'Content-Type': 'application/json',
+    //         'Accept': 'application/json'
+    //     };
+    //     ajax(urlLogin, JSON.stringify(data), function (data) {
+    //             data = JSON.parse(data);
+    //             if (!data.success) {
+    //                 return app.error(data.data.message);
+    //             }
+    //             app.UI.showForm('join');
+    //             var user = data.data;
+    //             app.saveUser(user);
+    //             app.setUser(user);
+    //         },
+    //         headers);
+    // },
+    // register: function () {
+    //     var name = document.getElementById('register-name').value;
+    //     var email = document.getElementById('register-email').value;
+    //     var password = document.getElementById('register-password').value;
+    //     var urlRegister = app.settings.host;
+    //     urlRegister += 'users/add';
+    //     var data = {
+    //         "profile": {
+    //             "name": name
+    //         },
+    //         "email": email,
+    //         "password": password
+    //     };
+    //     var headers = {
+    //         'Content-Type': 'application/json',
+    //         'Accept': 'application/json'
+    //     };
+    //     ajax(urlRegister, JSON.stringify(data), function (data) {
+    //             data = JSON.parse(data);
+    //             if (!data.success) {
+    //                 return app.error(data.data.message);
+    //             }
+    //             app.UI.showForm('join');
+    //             var user = data.data;
+    //             app.saveUser(user);
+    //             app.setUser(user);
+    //             app.settings.user = user;
+    //         },
+    //         headers
+    //     );
+    // },
+    // logout: function () {
+    //     app.saveUser();
+    //     app.setUser();
+    //     app.UI.hideMenu();
+    // },
     /**
      * Set the user in the app settings variable.
      *
@@ -262,7 +262,7 @@ var app = {
 };
 app.UI = {
     formNames: [
-        'login', 'register', 'join', 'help'
+        'join', 'help'
     ],
     menuDisplayed: false,
     init: function () {
@@ -316,25 +316,25 @@ app.UI = {
             name: 'Play',
             click: 'app.UI.showForm(\'join\');'
         });
-        if (app.settings.user.token == null) {
-            links.push({
-                url: '',
-                name: 'Login',
-                click: 'app.UI.showForm(\'login\');'
-            });
-            links.push({
-                url: '',
-                name: 'Register',
-                click: 'app.UI.showForm(\'register\');'
-            });
-        }
-        else {
-            links.push({
-                url: '',
-                name: 'Logout',
-                click: 'app.logout();'
-            });
-        }
+        // if (app.settings.user.token == null) {
+        //     links.push({
+        //         url: '',
+        //         name: 'Login',
+        //         click: 'app.UI.showForm(\'login\');'
+        //     });
+        //     links.push({
+        //         url: '',
+        //         name: 'Register',
+        //         click: 'app.UI.showForm(\'register\');'
+        //     });
+        // }
+        // else {
+        //     links.push({
+        //         url: '',
+        //         name: 'Logout',
+        //         click: 'app.logout();'
+        //     });
+        // }
         links.push({
             url: '',
             name: 'Help',
