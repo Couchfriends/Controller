@@ -38,7 +38,6 @@ Controller.Button.prototype.onButtonDown = function(data) {
 };
 
 Controller.Button.prototype.onButtonUp = function(data) {
-
     if (this.touchIdentifier != data.data.identifier) {
         return;
     }

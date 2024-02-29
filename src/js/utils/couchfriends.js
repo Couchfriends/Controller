@@ -101,6 +101,7 @@ Emitter(COUCHFRIENDS);
  * @return void
  */
 COUCHFRIENDS.on('error', function (data) {
+    console.warn(data);
     if (typeof data == 'string') {
         data = {
             message: data
